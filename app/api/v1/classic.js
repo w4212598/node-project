@@ -1,18 +1,21 @@
 const Router = require("koa-router");
-const { PositiveIntegerValidator } = require('../../validators/validator');
+const { Auth } = require("../../../middlewares/auth");
+const { Flow } = require("../../models/flow");
+const { Art } = require("../../models/art");
 
-const router = new Router();
+const router = new Router({
+  prefix: "/v1/classic",
+});
 
-router.post("/v1/:id/classic/latest", (ctx, next) => {
-  const path = ctx.params;
-  const query = ctx.request.query;
-  const header = ctx.request.header;
-  const body = ctx.request.body;
-
-
-  const v = new PositiveIntegerValidator().validate(ctx);
-  const id = v.get('path.id',false);
-
+router.get("/latest", new Auth(2).m, async (ctx, next) => {
+  const flow = await Flow.findOne({
+    order: [
+      ["index", "DESC"], //指明使用index字段排序
+    ],
+  });
+  const art = (await Art.getData(flow.artId, flow.type)) || {};
+  art.setDataValue("index", flow.index);
+  ctx.body = art;
 });
 
 module.exports = router;

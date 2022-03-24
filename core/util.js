@@ -40,7 +40,7 @@ const findMembers = function (instance, { prefix, specifiedType, filter }) {
 const generateToken = function (uid, scope) {
   const secretKey = global.config.security.secretKey;
   const expiresIn = global.config.security.expiresIn;
-  const token = jwt.sign(
+  return jwt.sign(
     {
       uid,
       scope, // 权限
@@ -50,7 +50,6 @@ const generateToken = function (uid, scope) {
       expiresIn,
     }
   );
-  return token;
 };
 
 module.exports = {
